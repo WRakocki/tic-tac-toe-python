@@ -5,7 +5,7 @@ class TicTacToe:
         #self.window = tk.Tk()
         #self.window.title("Tic-Tac-Toe")
         #self.window.geometry("200x200")
-        self.activePlayer = "X"
+        self.choice = []
 
     def createGameBoard(self):
         """
@@ -42,54 +42,68 @@ class TicTacToe:
 
 
     def update_board(self):
-        if self.activePlayer == 'X':
-            x = int(input("X: "))
-            y = int(input("Y: "))
-            self.board[x][y] = 'X'
-            for i in range(3):
+        for i in range(3):
                 print(self.board[i])
-            self.activePlayer = 'O'
-        else:
-            self.minmax(self.board)
+                
+        
             
 
     def runGame(self):
         self.createGameBoard()
-        while True:
+        isMaximizingPlayer = True
+        while not self.is_over(self.board, isMaximizingPlayer):
             self.update_board()
+            move = self.choose_move(self.board, isMaximizingPlayer)
+            self.board = self.get_new_state(move, self.board, isMaximizingPlayer)
+            isMaximizingPlayer = self.change_player(isMaximizingPlayer)
+            
+
+
         #self.window.mainloop()
         
     
-    def minmax(self, board):
+    def minmax(self, board, isMaximizingPlayer):
 
-        if (self.is_over(board)):
-            return self.calculate_score(board)
+        if (self.is_over(board, isMaximizingPlayer)):
+            return self.calculate_score(board, isMaximizingPlayer)
         
-        scores = []
-        moves = []
-
-        available_moves = self.get_available_moves(board)
-
-        for move in available_moves:
-            possible_board = self.get_new_state(move, board)
-            scores.append(self.minmax(possible_board))
-            moves.append(move)
-
-        if self.activePlayer == 'X':
+        if isMaximizingPlayer:
+            scores = []
+            moves = []
+            available_moves = self.get_available_moves(board)
+            for move in available_moves:
+                possible_board = self.get_new_state(move, board, False)
+                moves.append(move)
+                scores.append(self.minmax(possible_board, False))
             max_score_index = scores.index(max(scores))
-            choice = moves[max_score_index]
+            self.choice = moves[max_score_index]
             return scores[max_score_index]
         else:
+            scores = []
+            moves = []
+            available_moves = self.get_available_moves(board)
+            for move in available_moves:
+                possible_board = self.get_new_state(move, board, True)
+                moves.append(move)
+                scores.append(self.minmax(possible_board, True))
             min_score_index = scores.index(min(scores))
-            choice = moves[min_score_index]
+            self.choice = moves[min_score_index]
             return scores[min_score_index]
+        
+        
     
-    def is_over(self, board):
+    def is_over(self, board, isMaximizingPlayer):
+
+        if isMaximizingPlayer:
+            player = 'X'
+        else:
+            player = 'O'
+
         #check rows
         for i in range(3):
             count = 0
             for j in range(3):
-                if board[i][j] == 'X':
+                if board[i][j] == player:
                     count += 1
                 if count == 3:
                     return True
@@ -98,7 +112,7 @@ class TicTacToe:
         for j in range(3):
             count = 0
             for i in range(3):
-                if board[i][j] == 'X':
+                if board[i][j] == player:
                     count += 1
                 if count == 3:
                     return True
@@ -106,7 +120,7 @@ class TicTacToe:
         #check first diagonal
         count = 0
         for i in range(3):
-            if board[i][i] == 'X':
+            if board[i][i] == player:
                 count += 1
             if count == 3:
                 return True
@@ -114,7 +128,7 @@ class TicTacToe:
         #check second diagonal   
         count = 0
         for i in range(3):
-            if board[i][i] == 'X':
+            if board[i][i] == player:
                 count += 1
             if count == 3:
                 return True
@@ -130,13 +144,12 @@ class TicTacToe:
         
         return False
                 
-    def calculate_score(self, board):
-        if self.activePlayer == 'X':
+    def calculate_score(self, board, isMaximizingPlayer):
+        if isMaximizingPlayer:
             return 10
-        elif self.activePlayer == 'O':
-            return -10
         else:
-            return 0
+            return -10
+        
     
     def get_available_moves(self, board):
         avalaible_moves = []
@@ -146,10 +159,31 @@ class TicTacToe:
                     avalaible_moves.append([i, j])
         return avalaible_moves
 
-    def get_new_state(self, move, board):
-        board[move[0]][move[1]] = 'O'
+    def get_new_state(self, move, board, isMaximizingPlayer):
+        
+        if isMaximizingPlayer:
+            board[move[0]][move[1]] = 'X'
+        else:
+            board[move[0]][move[1]] = 'O'
+        
         return board
 
+    def choose_move(self, board, isMaximizingPlayer):
+        if isMaximizingPlayer:
+            x = int(input("X:"))
+            y = int(input("Y:"))
+            move = [x, y]
+            return move
+        else:
+            self.minmax(board, isMaximizingPlayer)
+            return self.choice
+
+    def change_player(self, isMaximizingPlayer):
+        if isMaximizingPlayer:
+            return False
+        else:
+            return True
+        
         
             
 
