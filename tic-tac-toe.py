@@ -1,28 +1,29 @@
 import copy
+
 import tkinter as tk
 
 
 class TicTacToe:
     def __init__(self):
-        # self.window = tk.Tk()
-        # self.window.title("Tic-Tac-Toe")
-        # self.window.geometry("200x200")
+        self.window = tk.Tk()
+        self.window.title("Tic-Tac-Toe")
+        self.window.geometry("200x200")
         self.choice = []
 
     def create_game_board(self):
-        """
+
         self.buttons = [
                     [0, 0, 0],
                     [0, 0, 0],
                     [0, 0, 0]
                 ]
-        """
+
         self.board = [
             [0, 0, 0],
             [0, 0, 0],
             [0, 0, 0]
         ]
-        """
+
         label = tk.Label(text = "test")
         for i in range(3):
             for j in range(3):
@@ -31,9 +32,9 @@ class TicTacToe:
                                                 height=5, width=10, 
                                                 command = lambda x = i, y = j : self.buttonHandling(x,y))
                 self.buttons[i][j].grid(row = i, column = j)
-        """
 
-    """
+
+    # TODO Graphics
     def buttonHandling(self, x, y):
         self.buttons[x][y].configure(text = f"{self.activePlayer}")
         self.board[x][y] = self.activePlayer
@@ -41,22 +42,23 @@ class TicTacToe:
             self.activePlayer = "O"
         else:
             self.activePlayer = "X"
-    """
+
 
     def update_board(self):
         for i in range(3):
-            print(self.board[i])
+            for j in range(3):
+                self.buttons[i][j].configure(text="X")
+
 
     def runGame(self):
         self.create_game_board()
         isMaximizingPlayer = True
         while not self.is_over(self.board):
-            self.update_board()
+            self.window.mainloop()
             move = self.choose_move(self.board, isMaximizingPlayer)
             self.board = self.get_new_state(move, self.board, isMaximizingPlayer)
             isMaximizingPlayer = self.change_player(isMaximizingPlayer)
 
-        # self.window.mainloop()
 
     def minmax(self, board, isMaximizingPlayer):
 
