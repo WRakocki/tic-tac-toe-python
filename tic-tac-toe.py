@@ -50,18 +50,18 @@ class TicTacToe:
     def runGame(self):
         self.create_game_board()
         isMaximizingPlayer = True
-        while not self.is_over(self.board, isMaximizingPlayer):
+        while not self.is_over(self.board):
             self.update_board()
             move = self.choose_move(self.board, isMaximizingPlayer)
             self.board = self.get_new_state(move, self.board, isMaximizingPlayer)
             isMaximizingPlayer = self.change_player(isMaximizingPlayer)
 
         # self.window.mainloop()
-#TODO: is_over() function does not work properly, it possibly breaks the algorithm
+
     def minmax(self, board, isMaximizingPlayer):
 
-        if self.is_over(board, isMaximizingPlayer):
-            return self.calculate_score(board, isMaximizingPlayer)
+        if self.is_over(board):
+            return self.calculate_score(board)
 
         if isMaximizingPlayer:
             scores = []
@@ -86,67 +86,70 @@ class TicTacToe:
             self.choice = moves[min_score_index]
             return scores[min_score_index]
 
-    def is_over(self, board, isMaximizingPlayer):
+    def calculate_score(self, board):
 
-        if isMaximizingPlayer:
-            player = 'X'
-        else:
-            player = 'O'
+        player_max = 'X'
+        player_min = 'O'
 
         # check rows
         for i in range(3):
-            count = 0
+            count_max = 0
+            count_min = 0
             for j in range(3):
-                if board[i][j] == player:
-                    count += 1
-                if count == 3:
-                    return True
+                if board[i][j] == player_max:
+                    count_max += 1
+                if board[i][j] == player_min:
+                    count_min += 1
+                if count_max == 3:
+                    return 10
+                if count_min == 3:
+                    return -10
 
         # check columns
         for j in range(3):
-            count = 0
+            count_max = 0
+            count_min = 0
             for i in range(3):
-                if board[i][j] == player:
-                    count += 1
-                if count == 3:
-                    return True
+                if board[i][j] == player_max:
+                    count_max += 1
+                if board[i][j] == player_min:
+                    count_min += 1
+                if count_max == 3:
+                    return 10
+                if count_min == 3:
+                    return -10
 
         # check first diagonal
-        count = 0
+        count_max = 0
+        count_min = 0
         for i in range(3):
-            if board[i][i] == player:
-                count += 1
-            if count == 3:
-                return True
+            if board[i][i] == player_max:
+                count_max += 1
+            if board[i][i] == player_min:
+                count_min += 1
+            if count_max == 3:
+                return 10
+            if count_min == 3:
+                return -10
 
         # check second diagonal
-        count = 0
+        count_max = 0
+        count_min = 0
         for i in range(3):
-            if board[i][i] == player:
-                count += 1
-            if count == 3:
-                return True
+            if board[i][2 - i] == player_max:
+                count_max += 1
+            if board[i][2 - i] == player_min:
+                count_min += 1
+            if count_max == 3:
+                return 10
+            if count_min == 3:
+                return -10
 
         # check for draw
-        count = 0
-        for i in range(3):
-            for j in range(3):
-                if board[i][j] != 0:
-                    count += 1
-                if count == 9:
-                    return True
+        return 0
 
-        return False
 
-    def calculate_score(self, board, isMaximizingPlayer):
-        if self.is_draw(board, isMaximizingPlayer):
-            return 0
-        if isMaximizingPlayer:
-            return 10
-        else:
-            return -10
-
-    def is_draw(self, board, isMaximizingPlayer):
+    def is_over(self, board):
         count = 0
         for i in range(3):
             for j in range(3):
@@ -156,12 +159,12 @@ class TicTacToe:
                     return True
 
     def get_available_moves(self, board):
-        avalaible_moves = []
+        available_moves = []
         for i in range(3):
             for j in range(3):
                 if board[i][j] == 0:
-                    avalaible_moves.append([i, j])
-        return avalaible_moves
+                    available_moves.append([i, j])
+        return available_moves
 
     def get_new_state(self, move, board, isMaximizingPlayer):
         board_copy = copy.deepcopy(board)
