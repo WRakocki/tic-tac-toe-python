@@ -24,31 +24,24 @@ class TicTacToe:
             [0, 0, 0]
         ]
 
-        label = tk.Label(text = "test")
+        label = tk.Label(text="test")
         for i in range(3):
             for j in range(3):
                 self.buttons[i][j] = tk.Button(
                                                 self.window, 
                                                 height=5, width=10, 
-                                                command = lambda x = i, y = j : self.buttonHandling(x,y))
-                self.buttons[i][j].grid(row = i, column = j)
-
+                                                command=lambda x=i, y=j: self.button_handling(x, y))
+                self.buttons[i][j].grid(row=i, column=j)
 
     # TODO Graphics
-    def buttonHandling(self, x, y):
-        self.buttons[x][y].configure(text = f"{self.activePlayer}")
-        self.board[x][y] = self.activePlayer
-        if self.activePlayer == "X":
-            self.activePlayer = "O"
-        else:
-            self.activePlayer = "X"
-
+    def button_handling(self, x, y):
+        move = [x, y]
+        return move
 
     def update_board(self):
         for i in range(3):
             for j in range(3):
                 self.buttons[i][j].configure(text="X")
-
 
     def runGame(self):
         self.create_game_board()
@@ -58,7 +51,6 @@ class TicTacToe:
             move = self.choose_move(self.board, isMaximizingPlayer)
             self.board = self.get_new_state(move, self.board, isMaximizingPlayer)
             isMaximizingPlayer = self.change_player(isMaximizingPlayer)
-
 
     def minmax(self, board, isMaximizingPlayer):
 
@@ -179,9 +171,7 @@ class TicTacToe:
 
     def choose_move(self, board, isMaximizingPlayer):
         if isMaximizingPlayer:
-            x = int(input("X:"))
-            y = int(input("Y:"))
-            move = [x, y]
+
             return move
         else:
             self.minmax(board, isMaximizingPlayer)
