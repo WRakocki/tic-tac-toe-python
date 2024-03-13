@@ -1,22 +1,21 @@
 import copy
-
+import time
 import tkinter as tk
+from tkinter import messagebox
+
 
 
 class TicTacToe:
-    def __init__(self):
-        self.window = tk.Tk()
+    def __init__(self, window):
+        self.window = window
         self.window.title("Tic-Tac-Toe")
-        self.window.geometry("200x200")
+        self.window.geometry("450x490")
+        self.create_game_board()
+        self.create_gui()
         self.choice = []
+        self.isMaximizingPlayer = True
 
     def create_game_board(self):
-
-        self.buttons = [
-                    [0, 0, 0],
-                    [0, 0, 0],
-                    [0, 0, 0]
-                ]
 
         self.board = [
             [0, 0, 0],
@@ -24,33 +23,65 @@ class TicTacToe:
             [0, 0, 0]
         ]
 
-        label = tk.Label(text="test")
+    def create_gui(self):
+
+        self.buttons = [
+                    [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0]
+                ]
         for i in range(3):
             for j in range(3):
-                self.buttons[i][j] = tk.Button(
-                                                self.window, 
-                                                height=5, width=10, 
-                                                command=lambda x=i, y=j: self.button_handling(x, y))
+                self.buttons[i][j] = tk.Button(self.window, text="", font=('normal', 20), width=8, height=4,
+                                               command=lambda x=i, y=j: self.make_move(x, y))
                 self.buttons[i][j].grid(row=i, column=j)
-
-    # TODO Graphics
-    def button_handling(self, x, y):
-        move = [x, y]
-        return move
 
     def update_board(self):
         for i in range(3):
             for j in range(3):
-                self.buttons[i][j].configure(text="X")
+                if self.board[i][j] == 0:
+                    symbol = ""
+                else:
+                    symbol = self.board[i][j]
+                self.buttons[i][j].config(text=symbol)
 
-    def runGame(self):
-        self.create_game_board()
-        isMaximizingPlayer = True
-        while not self.is_over(self.board):
-            self.window.mainloop()
-            move = self.choose_move(self.board, isMaximizingPlayer)
-            self.board = self.get_new_state(move, self.board, isMaximizingPlayer)
-            isMaximizingPlayer = self.change_player(isMaximizingPlayer)
+    def make_move(self, x, y):
+        if self.board[x][y] == 0 and not self.is_over(self.board):
+            self.board[x][y] = 'X'
+            self.update_board()
+            self.isMaximizingPlayer = False
+
+        if not self.isMaximizingPlayer and not self.is_over(self.board):
+            move = self.choose_move(self.board, False)
+            self.board = self.get_new_state(move, self.board, False)
+            self.update_board()
+            self.isMaximizingPlayer = True
+
+        if self.is_over(self.board):
+            winner = self.calculate_score(self.board)
+            if winner == 10:
+                if messagebox.askquestion("GAME OVER", "YOU WIN!\nRESTART?") == 'yes':
+                    self.window.destroy()
+                    main()
+                else:
+                    exit()
+            elif winner == -10:
+                if messagebox.askquestion("GAME OVER", "YOU LOSE!\nRESTART?") == 'yes':
+                    self.window.destroy()
+                    main()
+                else:
+                    exit()
+            else:
+                if messagebox.askquestion("GAME OVER", "DRAW!\nRESTART?") == 'yes':
+                    self.window.destroy()
+                    main()
+                else:
+                    exit()
+
+
+    def run_game(self):
+         self.window.mainloop()
+
 
     def minmax(self, board, isMaximizingPlayer):
 
@@ -142,15 +173,21 @@ class TicTacToe:
         # check for draw
         return 0
 
-
     def is_over(self, board):
-        count = 0
-        for i in range(3):
-            for j in range(3):
-                if board[i][j] != 0:
-                    count += 1
-                if count == 9:
-                    return True
+        if self.calculate_score(board) == 10:
+            return True
+        elif self.calculate_score(board) == -10:
+            return True
+        else:
+            #Check for draw
+            count = 0
+            for i in range(3):
+                for j in range(3):
+                    if board[i][j] != 0:
+                        count += 1
+                    if count == 9:
+                        return True
+        return False
 
     def get_available_moves(self, board):
         available_moves = []
@@ -170,23 +207,15 @@ class TicTacToe:
         return board_copy
 
     def choose_move(self, board, isMaximizingPlayer):
-        if isMaximizingPlayer:
-
-            return move
-        else:
             self.minmax(board, isMaximizingPlayer)
             return self.choice
 
-    def change_player(self, isMaximizingPlayer):
-        if isMaximizingPlayer:
-            return False
-        else:
-            return True
 
 
 def main():
-    game = TicTacToe()
-    game.runGame()
+    window = tk.Tk()
+    game = TicTacToe(window)
+    game.run_game()
 
 
 if __name__ == '__main__':
