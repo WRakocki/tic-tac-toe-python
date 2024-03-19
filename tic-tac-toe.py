@@ -1,8 +1,6 @@
 import copy
-import time
 import tkinter as tk
 from tkinter import messagebox
-
 
 
 class TicTacToe:
@@ -13,7 +11,7 @@ class TicTacToe:
         self.create_game_board()
         self.create_gui()
         self.choice = []
-        self.isMaximizingPlayer = True
+        self.is_maximizing_player = True
 
     def create_game_board(self):
 
@@ -49,13 +47,13 @@ class TicTacToe:
         if self.board[x][y] == 0 and not self.is_over(self.board):
             self.board[x][y] = 'X'
             self.update_board()
-            self.isMaximizingPlayer = False
+            self.is_maximizing_player = False
 
-        if not self.isMaximizingPlayer and not self.is_over(self.board):
+        if not self.is_maximizing_player and not self.is_over(self.board):
             move = self.choose_move(self.board, False)
             self.board = self.get_new_state(move, self.board, False)
             self.update_board()
-            self.isMaximizingPlayer = True
+            self.is_maximizing_player = True
 
         if self.is_over(self.board):
             winner = self.calculate_score(self.board)
@@ -78,17 +76,15 @@ class TicTacToe:
                 else:
                     exit()
 
-
     def run_game(self):
-         self.window.mainloop()
+        self.window.mainloop()
 
-
-    def minmax(self, board, isMaximizingPlayer):
+    def minmax(self, board, is_maximizing_player):
 
         if self.is_over(board):
             return self.calculate_score(board)
 
-        if isMaximizingPlayer:
+        if is_maximizing_player:
             scores = []
             moves = []
             available_moves = self.get_available_moves(board)
@@ -111,7 +107,47 @@ class TicTacToe:
             self.choice = moves[min_score_index]
             return scores[min_score_index]
 
-    def calculate_score(self, board):
+    def is_over(self, board):
+        if self.calculate_score(board) == 10:
+            return True
+        elif self.calculate_score(board) == -10:
+            return True
+        else:
+            # Check for draw
+            count = 0
+            for i in range(3):
+                for j in range(3):
+                    if board[i][j] != 0:
+                        count += 1
+                    if count == 9:
+                        return True
+        return False
+
+    def choose_move(self, board, is_maximizing_player):
+        self.minmax(board, is_maximizing_player)
+        return self.choice
+
+    @staticmethod
+    def get_available_moves(board):
+        available_moves = []
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == 0:
+                    available_moves.append([i, j])
+        return available_moves
+
+    @staticmethod
+    def get_new_state(move, board, is_maximizing_player):
+        board_copy = copy.deepcopy(board)
+        if is_maximizing_player:
+            board_copy[move[0]][move[1]] = 'X'
+        else:
+            board_copy[move[0]][move[1]] = 'O'
+
+        return board_copy
+
+    @staticmethod
+    def calculate_score(board):
 
         player_max = 'X'
         player_min = 'O'
@@ -172,44 +208,6 @@ class TicTacToe:
 
         # check for draw
         return 0
-
-    def is_over(self, board):
-        if self.calculate_score(board) == 10:
-            return True
-        elif self.calculate_score(board) == -10:
-            return True
-        else:
-            #Check for draw
-            count = 0
-            for i in range(3):
-                for j in range(3):
-                    if board[i][j] != 0:
-                        count += 1
-                    if count == 9:
-                        return True
-        return False
-
-    def get_available_moves(self, board):
-        available_moves = []
-        for i in range(3):
-            for j in range(3):
-                if board[i][j] == 0:
-                    available_moves.append([i, j])
-        return available_moves
-
-    def get_new_state(self, move, board, isMaximizingPlayer):
-        board_copy = copy.deepcopy(board)
-        if isMaximizingPlayer:
-            board_copy[move[0]][move[1]] = 'X'
-        else:
-            board_copy[move[0]][move[1]] = 'O'
-
-        return board_copy
-
-    def choose_move(self, board, isMaximizingPlayer):
-            self.minmax(board, isMaximizingPlayer)
-            return self.choice
-
 
 
 def main():
